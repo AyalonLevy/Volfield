@@ -14,6 +14,7 @@ global_variable Render_State render_state;
 
 #include "platform_common.cpp"
 #include "renderer.cpp"
+#include "grid.cpp"
 #include "game.cpp"
 
 LRESULT CALLBACK window_callback(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
