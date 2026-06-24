@@ -1,8 +1,9 @@
 constexpr u32 COLOR_BG = 0x000000;
 constexpr u32 COLOR_PLAYER = 0x282828;
+constexpr u32 COLOR_ENEMY = 0xFF0028;
 
 internal void
-clear_screen(u32 color=COLOR_BG) {
+clear_screen(u32 color = COLOR_BG) {
 	u32* pixel = (u32*)render_state.memory;
 	for (int y = 0; y < render_state.height; y++) {
 		for (int x = 0; x < render_state.width; x++) {
@@ -31,7 +32,7 @@ global_variable float render_scale = 0.01f;
 
 internal void
 draw_rect(float x, float y, float half_size_x, float half_size_y, u32 color) {
-	
+
 	x *= render_state.height * render_scale;
 	y *= render_state.height * render_scale;
 	half_size_x *= render_state.height * render_scale;
