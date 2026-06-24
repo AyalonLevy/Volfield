@@ -1,4 +1,5 @@
 #include "utils.cpp"
+#include "platform_common.cpp"
 #include <windows.h>
 
 global_variable bool running = true;
@@ -10,9 +11,9 @@ struct Render_State {
 	BITMAPINFO bitmap_info;
 };
 
-global_variable Render_State render_state;
+global_variable Render_State render_state{};
+global_variable Game_State game_state{};
 
-#include "platform_common.cpp"
 #include "renderer.cpp"
 #include "grid.cpp"
 #include "game.cpp"
@@ -119,7 +120,7 @@ case vk: {\
 		}
 
 		// Simulate
-		simulate_game(&input, delta_time);
+		simulate_game(&input, delta_time, &game_state);
 
 		// Render
 		StretchDIBits(hdc, 0, 0, render_state.width, render_state.height, 0, 0, render_state.width, render_state.height, render_state.memory, &render_state.bitmap_info, DIB_RGB_COLORS, SRCCOPY);
