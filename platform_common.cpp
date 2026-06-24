@@ -8,7 +8,7 @@ enum {
 	BUTTON_DOWN,
 	BUTTON_LEFT,
 	BUTTON_RIGHT,
-	BUTTON_SHOOT,
+	BUTTON_ACTION,
 
 	BUTTON_COUNT,  // Should be the last item
 };
@@ -51,6 +51,7 @@ struct Entity {
 struct Game_State {
 	bool is_initialized;
 	bool player_is_drawing_trail;
+	bool player_can_exit_edge;
 	int filled_percent;
 	float speed;
 

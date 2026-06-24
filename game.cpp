@@ -19,6 +19,7 @@ init_game(Game_State* state) {
 	state->player.half_size_y = 2;
 	state->player.type = ENTITY_PLAYER;
 	state->player.is_active = true;
+	state->player_can_exit_edge = false;
 
 	// Init Boss
 	state->boss.x = 0.0;
@@ -127,8 +128,13 @@ simulate_game(Input* input, float dt, Game_State* state) {
 			new_player_x += state->speed * dt;
 		}
 
-		if (is_down(BUTTON_SHOOT)) {
+		if (is_down(BUTTON_ACTION)) {
+			state->player_can_exit_edge = true;
 			draw_rect(0, 0, 1, 1, 0xffffff);
+		}
+
+		if (released(BUTTON_ACTION)) {
+			state->player_can_exit_edge = false;
 		}
 
 		// Convert current and proposed floats into Arena Grid Indices
@@ -180,7 +186,15 @@ simulate_game(Input* input, float dt, Game_State* state) {
 				break;
 			}
 			else {
-				final_tile = EMPTY;
+				if (!state->player_is_drawing_trail && !state->player_can_exit_edge) {
+					target_arena_x = check_x - step_x;
+					target_arena_y = check_y - step_y;
+					final_tile = state->arena.memory[target_arena_y * state->arena.width + target_arena_x];
+					collided = true;
+					break;
+				} else {
+					final_tile = EMPTY;
+				}
 			}
 		}
 
