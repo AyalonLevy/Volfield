@@ -3,6 +3,50 @@
 #define released(b) (!input->buttons[b].is_down && input->buttons[b].changed)
 
 
+internal int
+get_completion_bonus(int percent) {
+	if (percent < 800) return 0;
+
+	static const int score_table[] = {
+		10000,  // 80
+		11000,  // 81
+		12000,  // 82
+		13000,  // 83
+		14000,  // 84
+		15000,  // 85
+		16000,  // 86
+		17000,  // 87
+		18000,  // 88
+		19000,  // 89
+		20000,  // 90
+		22000,  // 91
+		24000,  // 92
+		26000,  // 93
+		28000,  // 94
+		30000,  // 95
+		35000,  // 96
+		40000,  // 97
+		50000,  // 98
+		100000, // 99.0
+		110000, // 99.1
+		120000, // 99.2
+		130000, // 99.3
+		140000, // 99.4
+		150000, // 99.5
+		200000, // 99.6
+		250000, // 99.7
+		350000, // 99.8
+		500000, // 99.9
+	};
+
+	if (percent <= 990) {
+
+		int tens_digit = (percent / 10);
+		return score_table[tens_digit - 80];
+	}
+
+	return score_table[19 + (percent - 990)];
+}
 
 internal void
 init_game(Game_State* state) {
@@ -88,6 +132,9 @@ finalize_capture(Game_State* state) {
 			}
 		}
 	}
+
+	state->score += state->score_accumulator;
+	state->score_accumulator = 0;
 }
 
 
@@ -202,6 +249,12 @@ simulate_game(Input* input, float dt, Game_State* state) {
 		// Draw trail if stepped into EMPTY or just closed a loop
 		if (final_tile == EMPTY || hit_wall_while_drawing) {
 			draw_trail(state, current_arena_x, current_arena_y, target_arena_x, target_arena_y);
+
+			// Calculate how many grid cells the player moved this frame
+			int cells_traversed = abs(target_arena_x - current_arena_x) + abs(target_arena_y - current_arena_y);
+
+			// Award 10 points per cell drawn in the void
+			state->score_accumulator += cells_traversed * CAPTURE_POINTS;
 		}
 
 		// Capture trigger
@@ -240,9 +293,19 @@ simulate_game(Input* input, float dt, Game_State* state) {
 	// Draw player
 	if (state->player.is_active) draw_rect(state->player.x, state->player.y, state->player.half_size_x, state->player.half_size_y, COLOR_PLAYER);
 	
-	// Draw enemies
+	//// Draw enemies
 	draw_rect(state->boss.x, state->boss.y, state->boss.half_size_x, state->boss.half_size_y, COLOR_ENEMY);
 
 	// Draw the percent filled
 	draw_ui_percent(state);
+
+	// Draw the top scores
+	draw_ui_top(state);
+
+	// TODO: remove this -> Pseudo win condition -> will draw a box on the screen when we reach the threshold
+	if (state->filled_percent >= state->win_condition && !state->level_cleared) {
+		draw_rect(0, 0, 10, 10, 0x005532);
+		state->score += get_completion_bonus(state->filled_percent);
+		state->level_cleared = true;
+	}
 }

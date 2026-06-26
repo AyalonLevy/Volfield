@@ -1,3 +1,8 @@
+constexpr int BOSS_KILL_BONUS = 100000;
+constexpr int MINION_KILL_BONUS = 2000;
+constexpr int CAPTURE_POINTS = 10;
+constexpr int POWERUP_BONUS_POINTS = 100;
+
 struct Button_State {
 	bool is_down;
 	bool changed;
@@ -52,8 +57,16 @@ struct Game_State {
 	bool is_initialized;
 	bool player_is_drawing_trail;
 	bool player_can_exit_edge;
+
 	int filled_percent;
 	float speed;
+
+	int score_accumulator = 0;
+	int score;
+	int high_score;
+
+	int win_condition = 800;
+	bool level_cleared = false;
 
 	Entity player;
 	Entity boss;
@@ -63,4 +76,23 @@ struct Game_State {
 
 	float min_pos_x, max_pos_x;
 	float min_pos_y, max_pos_y;
+};
+
+enum PowerUpType {
+	POWERUP_NONE,
+	POWERUP_POINTS,		// '-' - Gives bonus points
+	POWERUP_SPEED,		// 'S' - Increase speed
+	POWERUP_LASER,		// 'L' - Shoot laser that kills minions
+	POWERUP_TIME,		// 'T' - Stops the enemies for 10 seconds
+	POWERUP_PAUSE,		// 'P' - Stops the shield countdown for 10 seconds
+	POWERUP_DESTROY,	// 'C' - Kills all minions
+	POWERUP_BOSS_KILL,	// 'R' - Bombs to shoot the boss (red circle)
+
+	POWERUP_COUNT,		// Should be the last item
+};
+
+struct PowerUp {
+	PowerUpType type;
+	float x, y;
+	bool is_active;
 };
